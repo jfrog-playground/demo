@@ -40,8 +40,8 @@ jobs:
         run: |
           jf mvnc --repo-deploy-releases=ghavt-maven-local \
                    --repo-deploy-snapshots=ghavt-maven-local \
-                   --repo-resolve-releases=ghavt-maven-local \
-                   --repo-resolve-snapshots=ghavt-maven-local
+                   --repo-resolve-releases=ghavt-maven-remote \
+                   --repo-resolve-snapshots=ghavt-maven-remote
 
       - name: Build and Deploy
         run: jf mvn clean deploy
