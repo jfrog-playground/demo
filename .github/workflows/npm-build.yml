@@ -33,7 +33,7 @@ jobs:
         env:
           JF_URL: ${{ vars.JF_URL }}
         with:
-          oidc-provider-name: jfrog
+          oidc-provider-name: jfrog-playground/demo@github
 
       - name: Configure npm
         run: jf npmc --repo-resolve=ghavt-npm-local --repo-deploy=ghavt-npm-local
