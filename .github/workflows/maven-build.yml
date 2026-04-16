@@ -1,0 +1,53 @@
+name: Build Maven Package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pom.xml'
+      - 'src/**'
+      - '.github/workflows/maven-build.yml'
+  workflow_dispatch:
+
+env:
+  JFROG_CLI_BUILD_NAME: maven-build
+  JFROG_CLI_BUILD_NUMBER: ${{ github.run_number }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_URL: ${{ vars.JF_URL }}
+        with:
+          oidc-provider-name: jfrog
+
+      - name: Configure Maven
+        run: |
+          jf mvnc --repo-deploy-releases=ghavt-maven-local \
+                   --repo-deploy-snapshots=ghavt-maven-local \
+                   --repo-resolve-releases=ghavt-maven-local \
+                   --repo-resolve-snapshots=ghavt-maven-local
+
+      - name: Build and Deploy
+        run: jf mvn clean deploy
+
+      - name: Publish Build Info
+        run: |
+          jf rt bce
+          jf rt bag
+          jf rt bp

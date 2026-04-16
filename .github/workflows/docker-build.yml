@@ -1,0 +1,51 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/docker-build.yml'
+  workflow_dispatch:
+
+env:
+  JFROG_CLI_BUILD_NAME: docker-build
+  JFROG_CLI_BUILD_NUMBER: ${{ github.run_number }}
+  IMAGE_NAME: productdemo.jfrog.io/ghavt-docker-local/demo-app
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JFrog CLI
+        id: setup-cli
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_URL: ${{ vars.JF_URL }}
+        with:
+          oidc-provider-name: jfrog
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: productdemo.jfrog.io
+          username: ${{ steps.setup-cli.outputs.oidc-user }}
+          password: ${{ steps.setup-cli.outputs.oidc-token }}
+
+      - name: Build and Push
+        run: |
+          jf docker build -t $IMAGE_NAME:${{ github.run_number }} .
+          jf docker push $IMAGE_NAME:${{ github.run_number }}
+
+      - name: Publish Build Info
+        run: |
+          jf rt bce
+          jf rt bag
+          jf rt bp
