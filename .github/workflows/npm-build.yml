@@ -33,6 +33,9 @@ jobs:
         with:
           oidc-provider-name: jfrog-playground/demo@github
 
+      - name: Set version
+        run: npm version "1.0.${{ github.run_number }}" --no-git-tag-version
+
       - name: Configure npm
         run: jf npmc --repo-resolve=ghavt-npm-local --repo-deploy=ghavt-npm-local
 

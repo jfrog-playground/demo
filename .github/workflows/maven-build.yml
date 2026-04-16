@@ -41,6 +41,9 @@ jobs:
                    --repo-resolve-releases=ghavt-maven-remote \
                    --repo-resolve-snapshots=ghavt-maven-remote
 
+      - name: Set version
+        run: mvn versions:set -DnewVersion="1.0.${{ github.run_number }}" -DgenerateBackupPoms=false
+
       - name: Build and Deploy
         run: jf mvn clean deploy
 
