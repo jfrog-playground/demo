@@ -19,9 +19,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-      attestations: write
-      packages: write
-      artifact-metadata: write
     steps:
       - uses: actions/checkout@v4
 
@@ -41,19 +38,9 @@ jobs:
           password: ${{ steps.setup-cli.outputs.oidc-token }}
 
       - name: Build and Push
-        id: build-push
         run: |
           jf docker build -t $IMAGE_NAME:${{ github.run_number }} .
-          PUSH_OUTPUT=$(jf docker push $IMAGE_NAME:${{ github.run_number }} 2>&1 | tee /dev/stderr)
-          DIGEST=$(echo "$PUSH_OUTPUT" | grep -oP 'sha256:[a-f0-9]{64}' | head -1)
-          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-
-      - name: Attest Build Provenance
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-name: ${{ env.IMAGE_NAME }}
-          subject-digest: ${{ steps.build-push.outputs.digest }}
-          push-to-registry: true
+          jf docker push $IMAGE_NAME:${{ github.run_number }}
 
       - name: Publish Build Info
         run: |
