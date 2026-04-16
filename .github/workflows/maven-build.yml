@@ -21,6 +21,7 @@ jobs:
       id-token: write
       attestations: write
       packages: write
+      artifact-metadata: write
     steps:
       - uses: actions/checkout@v4
 
@@ -45,6 +46,11 @@ jobs:
 
       - name: Build and Deploy
         run: jf mvn clean deploy
+
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: 'target/*.jar'
 
       - name: Publish Build Info
         run: |

@@ -21,6 +21,7 @@ jobs:
       id-token: write
       attestations: write
       packages: write
+      artifact-metadata: write
     steps:
       - uses: actions/checkout@v4
 
@@ -38,8 +39,16 @@ jobs:
       - name: Configure npm
         run: jf npmc --repo-resolve=ghavt-npm-local --repo-deploy=ghavt-npm-local
 
+      - name: Pack
+        run: npm pack
+
       - name: Publish
         run: jf npm publish
+
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: '*.tgz'
 
       - name: Publish Build Info
         run: |
