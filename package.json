@@ -1,6 +1,6 @@
 {
-  "name": "@jfrog-playground/demo",
-  "version": "1.0.1",
+  "name": "@jfrog-playground/npm_demo",
+  "version": "1.0.0",
   "description": "JFrog GitHub Integration Demo Package",
   "main": "index.js",
   "scripts": {
